@@ -6,22 +6,29 @@ import { useEffect, useState } from 'react';
 type Theme = 'light' | 'dark';
 
 const THEME_STORAGE_KEY = 'bingo-theme';
+const THEME_COLOR: Record<Theme, string> = { light: '#fbf7ec', dark: '#15302a' };
+
+function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
+}
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    if (storedTheme === 'dark' || storedTheme === 'light') {
-      setTheme(storedTheme);
-      document.documentElement.dataset.theme = storedTheme;
+    // The inline script in the root layout already applied the saved theme
+    // before paint; just sync this component's state to match it.
+    const current = document.documentElement.dataset.theme;
+    if (current === 'dark' || current === 'light') {
+      setTheme(current);
     }
   }, []);
 
   const toggleTheme = () => {
     const nextTheme: Theme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
-    document.documentElement.dataset.theme = nextTheme;
+    applyTheme(nextTheme);
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   };
 

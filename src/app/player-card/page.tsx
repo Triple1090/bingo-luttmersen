@@ -173,11 +173,13 @@ export default function PlayerCardPage() {
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-bingo-bg">
       {/* Controls */}
-      <div className="flex w-full items-center justify-center gap-4 bg-bingo-surface p-4">
+      <div className="flex w-full flex-wrap items-center justify-center gap-3 border-b-2 border-bingo-border bg-bingo-surface p-4">
+        <label className="sr-only" htmlFor="card-count">Anzahl Karten</label>
         <select
+          id="card-count"
           value={cardCount}
           onChange={(e) => handleCardCountChange(Number(e.target.value))}
-          className="rounded border border-bingo-muted bg-bingo-bg px-4 py-2 text-xl text-bingo-text"
+          className="rounded-xl border-2 border-bingo-border bg-bingo-bg px-4 py-2 text-lg font-bold text-bingo-text"
         >
           {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
             <option key={n} value={n}>{n} Karte{n > 1 ? 'n' : ''}</option>
@@ -194,7 +196,7 @@ export default function PlayerCardPage() {
             if (room) setVariant(room.variant);
           }}
           onFocus={() => void loadRooms()}
-          className="w-52 rounded border border-bingo-muted bg-bingo-bg px-4 py-2 text-xl text-bingo-text"
+          className="w-52 rounded-xl border-2 border-bingo-border bg-bingo-bg px-4 py-2 text-lg font-bold text-bingo-text"
         >
           <option value="">Raum auswählen</option>
           {supportedRooms.map((room) => (
@@ -206,7 +208,7 @@ export default function PlayerCardPage() {
           type="button"
           onClick={handleNewCards}
           title="Neue Karten erzeugen"
-          className="flex h-11 w-11 items-center justify-center rounded border border-bingo-muted bg-bingo-bg text-bingo-text hover:bg-bingo-undrawn"
+          className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-bingo-border bg-bingo-bg text-bingo-text transition hover:border-bingo-accent hover:text-bingo-accent"
         >
           <RefreshCw className="h-5 w-5" />
           <span className="sr-only">Neue Karten erzeugen</span>
@@ -215,7 +217,7 @@ export default function PlayerCardPage() {
         <button
           type="button"
           onClick={handlePrint}
-          className="flex items-center gap-2 rounded-xl bg-bingo-accent px-6 py-2 text-lg font-bold text-bingo-bg hover:opacity-90"
+          className="flex items-center gap-2 rounded-xl bg-bingo-accent px-6 py-2 text-lg font-extrabold text-bingo-on-accent transition hover:brightness-105"
         >
           <Printer className="h-5 w-5" />
           Drucken
@@ -225,13 +227,13 @@ export default function PlayerCardPage() {
           type="button"
           onClick={handlePdfExport}
           disabled={isExporting}
-          className="flex items-center gap-2 rounded-xl border-2 border-bingo-accent px-6 py-2 text-lg font-bold text-bingo-accent hover:bg-bingo-accent hover:text-bingo-bg disabled:cursor-wait disabled:opacity-60"
+          className="flex items-center gap-2 rounded-xl border-2 border-bingo-accent px-6 py-2 text-lg font-bold text-bingo-accent transition hover:bg-bingo-accent hover:text-bingo-on-accent disabled:cursor-wait disabled:opacity-60"
         >
           <Download className="h-5 w-5" />
           {isExporting ? 'PDF wird erstellt …' : 'PDF herunterladen'}
         </button>
-        {exportError && <p role="alert" className="text-sm text-red-300">{exportError}</p>}
-        {exportComplete && <p role="status" className="text-sm text-bingo-muted">PDF-Download gestartet.</p>}
+        {exportError && <p role="alert" className="w-full text-center text-sm font-semibold text-bingo-danger">{exportError}</p>}
+        {exportComplete && <p role="status" className="w-full text-center text-sm text-bingo-muted">PDF-Download gestartet.</p>}
       </div>
 
       {/* Card display */}

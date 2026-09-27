@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, ChevronDown, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useGameSession } from '@/lib/useGameSession';
 import { RecentCalls } from '@/components/RecentCalls';
@@ -173,104 +173,128 @@ function AdminPanel() {
   }, [handleKeyDown]);
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-bingo-bg p-8 text-2xl">
+    <div className="min-h-screen w-full bg-bingo-bg px-4 py-8 text-xl sm:px-6">
       {serviceError && (
-        <div role="alert" className="fixed right-4 top-4 z-50 flex max-w-md items-start gap-3 rounded-lg border-2 border-bingo-danger bg-bingo-surface p-4 text-lg text-bingo-text shadow-2xl">
+        <div role="alert" className="fixed right-4 top-4 z-50 flex max-w-md items-start gap-3 rounded-2xl border-2 border-bingo-danger bg-bingo-surface p-4 text-lg text-bingo-text shadow-2xl">
           <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-bingo-danger" aria-hidden="true" />
-          <p className="font-bold">{serviceError}</p>
+          <p className="font-semibold">{serviceError}</p>
           <button
             type="button"
             onClick={() => setServiceError(null)}
             title="Hinweis schließen"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-bingo-muted text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bingo-border text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
           >
             <X className="h-5 w-5" aria-hidden="true" />
             <span className="sr-only">Hinweis schließen</span>
           </button>
         </div>
       )}
-      <h1 className="mb-8 heading-lg font-bold text-bingo-text">Admin-Panel</h1>
-      <div className="flex flex-col gap-6">
-        <section className="flex flex-col gap-3">
-          <label htmlFor="room-id" className="font-bold text-bingo-text">Aktiver Raum</label>
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              id="room-id"
-              value={roomId}
-              onChange={(event) => router.push(`/admin-panel?room=${encodeURIComponent(event.target.value)}`)}
-              className="w-56 rounded border-2 border-bingo-muted bg-bingo-surface px-4 py-3 text-xl font-bold text-bingo-text"
-            >
-              {(rooms.some((room) => room.sessionId === roomId) ? rooms : [{ sessionId: roomId, roomName: roomId, variant, drawnCount: 0, status: 'waiting' as const }, ...rooms]).map((room) => (
-                <option key={room.sessionId} value={room.sessionId}>{room.roomName} – {getVariantLabel(room.variant)}, {room.drawnCount} gezogen</option>
-              ))}
-            </select>
-            <a
-              href={`/game-room?room=${encodeURIComponent(roomId)}`}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border-2 border-bingo-muted px-5 py-3 text-lg font-bold text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
-            >
-              Spielraum öffnen
-            </a>
+
+      <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+        <h1 className="text-center text-4xl text-bingo-text sm:text-5xl">Admin-Panel</h1>
+
+        <section aria-labelledby="draw-heading" className="flex flex-col gap-5 rounded-3xl border-2 border-bingo-border bg-bingo-surface p-5 shadow-[var(--bingo-shadow)] sm:p-6">
+          <h2 id="draw-heading" className="sr-only">Ziehung</h2>
+          <RecentCalls drawnNumbers={state?.drawnNumbers ?? []} />
+          <VariantSelector current={variant} onChange={handleVariantChange} />
+
+          <button
+            type="button"
+            onClick={handleDrawNumber}
+            className="w-full rounded-full bg-bingo-accent px-8 py-5 text-3xl font-extrabold text-bingo-on-accent shadow-[var(--bingo-shadow)] transition hover:brightness-105 active:translate-y-0.5 active:shadow-none"
+          >
+            Zahl ziehen
+          </button>
+
+          <details className="group">
+            <summary className="flex cursor-pointer select-none list-none items-center gap-1.5 font-semibold text-bingo-muted marker:content-none hover:text-bingo-accent">
+              <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
+              Oder bestimmte Zahl aufrufen …
+            </summary>
+            <form onSubmit={handleManualCall} className="mt-3 flex flex-col gap-3">
+              <label htmlFor="manual-number" className="font-semibold text-bingo-text">
+                Zahl (1–{maxNumber})
+              </label>
+              <div className="flex flex-wrap gap-3">
+                <input
+                  id="manual-number"
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  max={maxNumber}
+                  step="1"
+                  value={manualNumber}
+                  onChange={(event) => setManualNumber(event.target.value)}
+                  className="w-32 rounded-xl border-2 border-bingo-border bg-bingo-bg px-4 py-3 text-2xl font-bold text-bingo-text"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="flex-1 rounded-xl border-2 border-bingo-accent px-6 py-3 text-lg font-bold text-bingo-accent transition hover:bg-bingo-accent hover:text-bingo-on-accent"
+                >
+                  Zahl aufrufen
+                </button>
+              </div>
+              {error && <p role="alert" className="font-semibold text-bingo-danger">{error}</p>}
+            </form>
+          </details>
+        </section>
+
+        <section aria-labelledby="room-heading" className="flex flex-col gap-4 rounded-3xl border-2 border-bingo-border bg-bingo-surface p-5 shadow-[var(--bingo-shadow)] sm:p-6">
+          <h2 id="room-heading" className="text-2xl text-bingo-text">Raum</h2>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="room-id" className="font-semibold text-bingo-text">Aktiver Raum</label>
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                id="room-id"
+                value={roomId}
+                onChange={(event) => router.push(`/admin-panel?room=${encodeURIComponent(event.target.value)}`)}
+                className="min-w-0 flex-1 rounded-xl border-2 border-bingo-border bg-bingo-bg px-4 py-3 text-lg font-bold text-bingo-text"
+              >
+                {(rooms.some((room) => room.sessionId === roomId) ? rooms : [{ sessionId: roomId, roomName: roomId, variant, drawnCount: 0, status: 'waiting' as const }, ...rooms]).map((room) => (
+                  <option key={room.sessionId} value={room.sessionId}>{room.roomName} – {getVariantLabel(room.variant)}, {room.drawnCount} gezogen</option>
+                ))}
+              </select>
+              <a
+                href={`/game-room?room=${encodeURIComponent(roomId)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-xl border-2 border-bingo-border px-4 py-3 text-base font-bold text-bingo-text transition hover:border-bingo-accent hover:text-bingo-accent"
+              >
+                Spielraum öffnen
+              </a>
+            </div>
           </div>
-          <form onSubmit={handleCreateRoom} className="flex flex-wrap items-center gap-3">
-            <label htmlFor="new-room-name" className="font-bold text-bingo-text">Neuer Raum</label>
-            <input id="new-room-name" type="text" value={newRoomName} onChange={(event) => setNewRoomName(event.target.value)} maxLength={40} className="w-56 rounded border-2 border-bingo-muted bg-bingo-surface px-4 py-3 text-xl font-bold text-bingo-text" required />
-            <button type="submit" className="rounded-lg bg-bingo-accent px-5 py-3 text-lg font-bold text-bingo-bg hover:opacity-90">Raum erstellen</button>
+          <form onSubmit={handleCreateRoom} className="flex flex-wrap items-end gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <label htmlFor="new-room-name" className="font-semibold text-bingo-text">Neuer Raum</label>
+              <input id="new-room-name" type="text" autoComplete="off" value={newRoomName} onChange={(event) => setNewRoomName(event.target.value)} maxLength={40} className="w-full rounded-xl border-2 border-bingo-border bg-bingo-bg px-4 py-3 text-lg font-bold text-bingo-text" required />
+            </div>
+            <button type="submit" className="rounded-xl bg-bingo-accent px-5 py-3 text-base font-extrabold text-bingo-on-accent transition hover:brightness-105">Raum erstellen</button>
           </form>
         </section>
-        <RecentCalls drawnNumbers={state?.drawnNumbers ?? []} />
-        <VariantSelector current={variant} onChange={handleVariantChange} />
-        <form onSubmit={handleManualCall} className="flex flex-col gap-3">
-          <label htmlFor="manual-number" className="font-bold text-bingo-text">
-            Bestimmte Zahl aufrufen (1–{maxNumber})
-          </label>
-          <div className="flex gap-3">
-            <input
-              id="manual-number"
-              type="number"
-              min="1"
-              max={maxNumber}
-              step="1"
-              value={manualNumber}
-              onChange={(event) => setManualNumber(event.target.value)}
-              className="w-40 rounded border-2 border-bingo-muted bg-bingo-surface px-4 py-3 text-3xl font-bold text-bingo-text"
-              required
-            />
-            <button
-              type="submit"
-              className="rounded-xl border-2 border-bingo-accent px-6 py-3 text-xl font-bold text-bingo-accent hover:bg-bingo-accent hover:text-bingo-bg"
-            >
-              Zahl aufrufen
-            </button>
-          </div>
-          {error && <p role="alert" className="text-lg font-bold text-bingo-danger">{error}</p>}
-        </form>
-        <button
-          type="button"
-          onClick={handleDrawNumber}
-          className="rounded-xl bg-bingo-accent px-8 py-4 text-3xl font-bold text-bingo-bg hover:opacity-90"
-        >
-          Zahl ziehen
-        </button>
-        <button
-          type="button"
-          onClick={() => setIsVerifyDialogOpen(true)}
-          className="rounded-lg border-2 border-bingo-success px-6 py-3 text-xl font-bold text-bingo-success hover:bg-bingo-success hover:text-bingo-bg"
-        >
-          Bingo prüfen
-        </button>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="rounded-xl border-2 border-bingo-muted px-6 py-2 text-lg text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
-        >
-          Spiel zurücksetzen
-        </button>
-        <p className="text-sm text-bingo-muted">
-          Tastatur: <kbd className="rounded bg-bingo-surface px-1.5 py-0.5 font-mono text-base">Leertaste</kbd> = Ziehen,{' '}
-          <kbd className="rounded bg-bingo-surface px-1.5 py-0.5 font-mono text-base">R</kbd> = Zurücksetzen
-        </p>
+
+        <section aria-labelledby="manage-heading" className="flex flex-col gap-3 rounded-3xl border-2 border-bingo-border bg-bingo-surface p-5 shadow-[var(--bingo-shadow)] sm:p-6">
+          <h2 id="manage-heading" className="text-2xl text-bingo-text">Verwaltung</h2>
+          <button
+            type="button"
+            onClick={() => setIsVerifyDialogOpen(true)}
+            className="w-full rounded-xl border-2 border-bingo-success px-6 py-3 text-xl font-bold text-bingo-success transition hover:bg-bingo-success hover:text-bingo-on-success"
+          >
+            Bingo prüfen
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="w-full rounded-xl border-2 border-bingo-border px-6 py-2 text-base font-semibold text-bingo-muted transition hover:border-bingo-danger hover:text-bingo-danger"
+          >
+            Spiel zurücksetzen
+          </button>
+          <p className="text-center text-sm text-bingo-muted">
+            Tastatur: <kbd className="rounded bg-bingo-bg px-1.5 py-0.5 font-mono text-sm">Leertaste</kbd> = Ziehen,{' '}
+            <kbd className="rounded bg-bingo-bg px-1.5 py-0.5 font-mono text-sm">R</kbd> = Zurücksetzen
+          </p>
+        </section>
       </div>
       {isVerifyDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
@@ -279,7 +303,7 @@ function AdminPanel() {
             aria-modal="true"
             aria-labelledby="verify-bingo-title"
             aria-describedby="verify-bingo-description"
-            className="w-full max-w-2xl rounded-lg border-2 border-bingo-muted bg-bingo-surface p-6 shadow-2xl"
+            className="w-full max-w-2xl rounded-3xl border-2 border-bingo-border bg-bingo-surface p-6 shadow-2xl"
           >
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
@@ -290,7 +314,7 @@ function AdminPanel() {
                 type="button"
                 onClick={() => setIsVerifyDialogOpen(false)}
                 title="Prüfdialog schließen"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 border-bingo-muted text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-bingo-border text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
               >
                 <X className="h-6 w-6" aria-hidden="true" />
                 <span className="sr-only">Schließen</span>
@@ -318,7 +342,7 @@ function AdminPanel() {
                         setClaimError(null);
                       }}
                       aria-label={`Zahl ${index + 1} der Gewinnreihe`}
-                      className="min-w-0 rounded-lg border-2 border-bingo-muted bg-bingo-bg px-2 py-3 text-center text-xl font-bold text-bingo-text"
+                      className="min-w-0 rounded-xl border-2 border-bingo-border bg-bingo-bg px-2 py-3 text-center text-xl font-bold text-bingo-text"
                       required
                     />
                   ))}
@@ -328,13 +352,13 @@ function AdminPanel() {
                 <button
                   type="button"
                   onClick={() => setIsVerifyDialogOpen(false)}
-                  className="rounded-lg border-2 border-bingo-muted px-6 py-3 text-xl font-bold text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
+                  className="rounded-xl border-2 border-bingo-border px-6 py-3 text-xl font-bold text-bingo-text hover:border-bingo-accent hover:text-bingo-accent"
                 >
                   Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-bingo-success px-6 py-3 text-xl font-bold text-bingo-bg hover:opacity-90"
+                  className="rounded-xl bg-bingo-success px-6 py-3 text-xl font-bold text-bingo-on-success transition hover:brightness-105"
                 >
                   Bingo prüfen
                 </button>

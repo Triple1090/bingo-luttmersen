@@ -22,7 +22,7 @@ export function GameSessionBar({ roomId, rooms, onRoomChange, variant, drawnCoun
       </label>
       <span>Variante: {variant}</span>
       <span>Gezogen: {drawnCount}</span>
-      <span className="text-bingo-accent">{getStatusLabel(status)}</span>
+      <span className="game-session-status">{getStatusLabel(status)}</span>
       <ThemeToggle />
     </header>
   );

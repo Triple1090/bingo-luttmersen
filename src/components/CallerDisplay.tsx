@@ -13,9 +13,15 @@ export function CallerDisplay({ number, className }: CallerDisplayProps) {
         className,
       )}
     >
-      <span className="caller-value" aria-live="polite" aria-atomic="true">
-        {number ?? '—'}
-      </span>
+      {number === null ? (
+        <span className="caller-placeholder" aria-live="polite" aria-atomic="true">
+          Bereit …
+        </span>
+      ) : (
+        <span key={number} className="caller-value" aria-live="polite" aria-atomic="true">
+          {number}
+        </span>
+      )}
     </div>
   );
 }

@@ -1,55 +1,134 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Marken-Schriften (Bingo-Abend Schützenverein Luttmersen) – lokal, OFL
+   ========================================================================== */
+
+@font-face {
+  font-family: "Alfa Slab One";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/AlfaSlabOne-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/DMSans-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/DMSans-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/DMSans-ExtraBold.woff2") format("woff2");
+}
+
 :root {
-  --bingo-bg: #ffffff;
-  --bingo-surface: #eef2f6;
-  --bingo-accent: #7a4a00;
-  --bingo-success: #137333;
-  --bingo-muted: #334155;
-  --bingo-text: #111827;
-  --bingo-undrawn: #dbe4ed;
-  --bingo-border: #475569;
-  --bingo-caller-bg: #ffffff;
-  --bingo-caller-value: #111827;
-  --bingo-drawn: #facc15;
-  --bingo-drawn-border: #713f12;
-  --bingo-danger: #b91c1c;
+  color-scheme: light;
+
+  --bingo-bg: #fbf7ec;
+  --bingo-surface: #f2e9d3;
+  --bingo-text: #15302a;
+  --bingo-muted: #6b6350;
+  --bingo-border: #e2d5b5;
+
+  --bingo-accent: #f28c28;
+  --bingo-on-accent: #15302a;
+  --bingo-success: #1f7a4d;
+  --bingo-on-success: #fbf7ec;
+  --bingo-danger: #b93f24;
+
+  --bingo-undrawn: #efe4c9;
+  --bingo-drawn: #f2c230;
+  --bingo-drawn-border: #a9720a;
+  --bingo-caller-bg: #fffdf7;
+  --bingo-caller-value: #15302a;
+
+  --bingo-shadow: 0 6px 0 rgba(21, 48, 42, 0.12);
 }
 
 :root[data-theme='dark'] {
-  --bingo-bg: #101827;
-  --bingo-surface: #1e293b;
-  --bingo-accent: #ffd23f;
-  --bingo-success: #4ade80;
-  --bingo-muted: #cbd5e1;
-  --bingo-text: #f8fafc;
-  --bingo-undrawn: #334155;
-  --bingo-border: #64748b;
-  --bingo-caller-bg: #172033;
-  --bingo-caller-value: #ffd23f;
-  --bingo-drawn: #ffd23f;
-  --bingo-drawn-border: #fff1a8;
-  --bingo-danger: #fca5a5;
+  color-scheme: dark;
+
+  --bingo-bg: #15302a;
+  --bingo-surface: #1e4038;
+  --bingo-text: #f6eedb;
+  --bingo-muted: #a9c2b8;
+  --bingo-border: #2c5348;
+
+  --bingo-accent: #f2c230;
+  --bingo-on-accent: #15302a;
+  --bingo-success: #5fd897;
+  --bingo-on-success: #15302a;
+  --bingo-danger: #ff7a5c;
+
+  --bingo-undrawn: #24463c;
+  --bingo-drawn: #f2c230;
+  --bingo-drawn-border: #b98a12;
+  --bingo-caller-bg: #0f2620;
+  --bingo-caller-value: #f2c230;
+
+  --bingo-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
 }
 
 @theme {
   --color-bingo-bg: var(--bingo-bg);
   --color-bingo-surface: var(--bingo-surface);
   --color-bingo-accent: var(--bingo-accent);
+  --color-bingo-on-accent: var(--bingo-on-accent);
   --color-bingo-success: var(--bingo-success);
+  --color-bingo-on-success: var(--bingo-on-success);
   --color-bingo-muted: var(--bingo-muted);
   --color-bingo-text: var(--bingo-text);
+  --color-bingo-border: var(--bingo-border);
   --color-bingo-undrawn: var(--bingo-undrawn);
   --color-bingo-danger: var(--bingo-danger);
+  --font-display: "Alfa Slab One", "DM Sans", sans-serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-html { font-size: 18px; }
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --bingo-motion-ok: 1;
+  }
+}
+
+html {
+  font-size: 18px;
+}
 
 body {
   margin: 0;
   background: var(--bingo-bg);
   color: var(--bingo-text);
-  font-family: Verdana, Geneva, sans-serif;
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-wrap: balance;
+}
+
+/* Native selects need explicit colors so Windows/forced dark mode doesn't
+   mismatch them against the surrounding theme. */
+select {
+  background-color: var(--bingo-surface);
+  color: var(--bingo-text);
 }
 
 .game-room {
@@ -68,15 +147,29 @@ body {
   align-items: center;
   padding: 1rem 1.5rem;
   background: var(--bingo-surface);
-  border: 2px solid #475569;
-  border-radius: 8px;
+  border: 2px solid var(--bingo-border);
+  border-radius: 14px;
   font-size: clamp(1.1rem, 1.8vw, 1.75rem);
   font-weight: 700;
 }
 
 .game-session-bar span:nth-child(2) { text-align: center; }
 .game-session-bar span:nth-child(3) { text-align: center; }
-.game-session-bar span:nth-child(4) { color: var(--bingo-accent); text-align: right; }
+
+.game-session-status {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2em 0.85em;
+  background: var(--bingo-accent);
+  border-radius: 999px;
+  color: var(--bingo-on-accent);
+  font-size: 0.65em;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 
 .game-session-room {
   display: flex;
@@ -91,7 +184,7 @@ body {
   padding: 0.35rem 1.75rem 0.35rem 0.5rem;
   background: var(--bingo-bg);
   border: 2px solid var(--bingo-border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--bingo-text);
   font: inherit;
   font-weight: 700;
@@ -103,16 +196,35 @@ body {
   min-height: 0;
   background: var(--bingo-caller-bg);
   border: 4px solid var(--bingo-accent);
-  border-radius: 8px;
+  border-radius: 20px;
+  box-shadow: var(--bingo-shadow);
 }
 
 .caller-value {
   color: var(--bingo-caller-value);
+  font-family: var(--font-display);
   font-size: clamp(8rem, 27vh, 20rem);
-  font-weight: 800;
   letter-spacing: 0;
   line-height: 0.82;
-  text-shadow: 0 4px 0 #000;
+  font-variant-numeric: tabular-nums;
+}
+
+.caller-placeholder {
+  color: var(--bingo-muted);
+  font-family: var(--font-body);
+  font-size: clamp(1.5rem, 4vh, 2.5rem);
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .caller-value {
+    animation: caller-pop 0.35s ease-out;
+  }
+}
+
+@keyframes caller-pop {
+  from { opacity: 0.4; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .bingo-board-section {
@@ -128,17 +240,18 @@ body {
   justify-content: center;
   gap: 1rem;
   padding: 0.75rem 1rem;
-  background: #166534;
-  border: 3px solid #bbf7d0;
-  border-radius: 8px;
-  color: #ffffff;
+  background: var(--bingo-success);
+  border: 3px solid var(--bingo-accent);
+  border-radius: 14px;
+  color: var(--bingo-on-success);
   font-size: clamp(1.25rem, 2.4vw, 2.5rem);
   font-weight: 700;
   text-align: center;
 }
 
 .bingo-announcement strong {
-  color: #fef08a;
+  color: var(--bingo-accent);
+  font-family: var(--font-display);
   font-size: 1.35em;
 }
 
@@ -152,8 +265,8 @@ body {
   min-height: 0;
   padding: clamp(0.75rem, 1.5vw, 1.5rem);
   background: var(--bingo-surface);
-  border: 2px solid #475569;
-  border-radius: 8px;
+  border: 2px solid var(--bingo-border);
+  border-radius: 14px;
 }
 
 .bingo-board--90 { --board-columns: 15; --board-rows: 6; }
@@ -165,18 +278,30 @@ body {
   place-items: center;
   min-width: 0;
   background: var(--bingo-undrawn);
-  border: 2px solid #64748b;
-  border-radius: 6px;
+  border: 2px solid var(--bingo-border);
+  border-radius: 8px;
   color: var(--bingo-text);
   font-size: clamp(1rem, 2.5cqi, 2.25rem);
   font-weight: 800;
   line-height: 1;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .bingo-board-cell.is-drawn {
   background: var(--bingo-drawn);
   border-color: var(--bingo-drawn-border);
-  color: #111827;
+  color: #15302a;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bingo-board-cell.is-drawn {
+    animation: cell-pop 0.3s ease-out;
+  }
+}
+
+@keyframes cell-pop {
+  from { transform: scale(0.85); }
+  to { transform: scale(1); }
 }
 
 .theme-toggle {
@@ -185,11 +310,10 @@ body {
   height: 2.75rem;
   place-items: center;
   padding: 0;
-  background: var(--bingo-surface);
+  background: var(--bingo-bg);
   border: 2px solid var(--bingo-border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--bingo-text);
-  box-shadow: 0 2px 8px rgb(15 23 42 / 25%);
 }
 
 .theme-toggle:hover {
@@ -225,15 +349,15 @@ body {
   min-height: 0;
   padding: 1rem;
   background: var(--bingo-surface);
-  border: 2px solid #475569;
-  border-radius: 8px;
+  border: 2px solid var(--bingo-border);
+  border-radius: 14px;
 }
 
 .draw-history-title {
   margin: 0 0 0.75rem;
   color: var(--bingo-text);
+  font-family: var(--font-display);
   font-size: clamp(1.1rem, 1.8vw, 1.5rem);
-  font-weight: 800;
 }
 
 .draw-history-list {
@@ -253,8 +377,8 @@ body {
   align-items: center;
   min-height: 3.25rem;
   background: var(--bingo-bg);
-  border: 1px solid #64748b;
-  border-radius: 6px;
+  border: 1px solid var(--bingo-border);
+  border-radius: 8px;
 }
 
 .draw-history-order {
@@ -262,12 +386,13 @@ body {
   font-size: 0.9rem;
   font-weight: 700;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .draw-history-number {
   color: var(--bingo-accent);
+  font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2.25rem);
-  font-weight: 800;
   line-height: 1;
   text-align: center;
 }
@@ -288,7 +413,8 @@ body {
 @media (max-width: 640px) {
   .game-room { grid-template-rows: auto 11rem auto; }
   .game-session-bar { grid-template-columns: 1fr; gap: 0.35rem; text-align: center; }
-  .game-session-bar span:nth-child(2), .game-session-bar span:nth-child(3), .game-session-bar span:nth-child(4) { text-align: center; }
+  .game-session-bar span:nth-child(2), .game-session-bar span:nth-child(3) { text-align: center; }
+  .game-session-status { justify-self: center; }
   .theme-toggle { justify-self: center; }
   .bingo-board--90 { --board-columns: 6; --board-rows: 15; }
   .bingo-board--75 { --board-columns: 6; --board-rows: 13; }
