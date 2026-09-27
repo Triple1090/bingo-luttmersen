@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DEFAULT_ROOM_ID } from '@/lib/gameRoom';
-import type { GameState } from '@/types/game';
+import type { GameState, GameVariant } from '@/types/game';
 
 export function useGameSession(url: string, sessionId = DEFAULT_ROOM_ID) {
   const [state, setState] = useState<GameState | null>(null);
@@ -34,7 +34,13 @@ export function useGameSession(url: string, sessionId = DEFAULT_ROOM_ID) {
       setConnected(true);
       ws.send(JSON.stringify({ action: 'subscribe', sessionId }));
     };
-    ws.onmessage = (e) => setState(JSON.parse(e.data));
+    ws.onmessage = (e) => {
+      try {
+        setState(JSON.parse(e.data));
+      } catch {
+        // Malformed messages are ignored; the next valid update will resync the state.
+      }
+    };
     ws.onclose = () => setConnected(false);
     return () => {
       isCurrent = false;
@@ -48,22 +54,30 @@ export function useGameSession(url: string, sessionId = DEFAULT_ROOM_ID) {
   };
 
   const callNumber = async (number: number) => {
-    return performGameAction('call-number', number);
+    return performGameAction('call-number', { number });
+  };
+
+  const resetGame = async () => {
+    return performGameAction('reset');
+  };
+
+  const changeVariant = async (variant: GameVariant) => {
+    return performGameAction('change-variant', { variant });
   };
 
   const performGameAction = async (
-    action: 'draw' | 'call-number',
-    number?: number,
+    action: 'draw' | 'call-number' | 'reset' | 'change-variant',
+    payload?: { number?: number; variant?: GameVariant },
   ) => {
     const response = await fetch('/api/game', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, sessionId, number }),
+      body: JSON.stringify({ action, sessionId, ...payload }),
     });
 
     if (!response.ok) {
       const result = (await response.json()) as { error?: string };
-      throw new Error(result.error ?? 'Unable to draw a number');
+      throw new Error(result.error ?? 'Aktion konnte nicht ausgeführt werden');
     }
 
     const result = (await response.json()) as { gameState: GameState };
@@ -71,5 +85,5 @@ export function useGameSession(url: string, sessionId = DEFAULT_ROOM_ID) {
   };
 
   const activeState = state?.sessionId === sessionId ? state : null;
-  return { state: activeState, connected, drawNumber, callNumber };
+  return { state: activeState, connected, drawNumber, callNumber, resetGame, changeVariant };
 }

@@ -25,7 +25,7 @@ export function ThemeToggle() {
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   };
 
-  const label = theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+  const label = theme === 'light' ? 'Zum dunklen Modus wechseln' : 'Zum hellen Modus wechseln';
 
   return (
     <button

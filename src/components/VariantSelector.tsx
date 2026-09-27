@@ -17,7 +17,7 @@ export function VariantSelector({ current, onChange, locked }: VariantSelectorPr
     >
       {Object.values(VARIANTS).map((v) => (
         <option key={v.name} value={v.name}>
-          {v.name}
+          {v.label}
         </option>
       ))}
     </select>

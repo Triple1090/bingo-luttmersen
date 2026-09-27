@@ -23,6 +23,7 @@ export type GameVariant = '90-ball' | '75-ball' | 'speedy';
 
 export interface VariantConfig {
   name: GameVariant;
+  label: string;
   maxNumber: number;
   cardsPerGame: number;
   drawIntervalMs?: number; // for auto-draw mode

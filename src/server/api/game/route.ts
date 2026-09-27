@@ -84,17 +84,17 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+    return NextResponse.json({ error: 'Ungültiger Anfrage-Body (kein gültiges JSON)' }, { status: 400 });
   }
 
   const { action, roomName, variant, number, claimedNumbers } = body;
   const sessionId = normalizeRoomId(body.sessionId);
 
   if (!['create-session', 'draw', 'call-number', 'reset', 'change-variant', 'verify-bingo'].includes(action)) {
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: 'Ungültige Aktion' }, { status: 400 });
   }
   if (action === 'change-variant' && (!variant || !VARIANTS[variant])) {
-    return NextResponse.json({ error: 'Unknown variant' }, { status: 400 });
+    return NextResponse.json({ error: 'Unbekannte Spielvariante' }, { status: 400 });
   }
 
   try {
@@ -108,12 +108,12 @@ export async function POST(req: NextRequest) {
         || number > maxNumber
       ) {
         return NextResponse.json(
-          { error: `Enter a whole number from 1 to ${maxNumber}` },
+          { error: `Gib eine ganze Zahl von 1 bis ${maxNumber} ein` },
           { status: 400 },
         );
       }
       if (currentState.drawnNumbers.includes(number)) {
-        return NextResponse.json({ error: 'That number has already been called' }, { status: 400 });
+        return NextResponse.json({ error: 'Diese Zahl wurde bereits aufgerufen' }, { status: 400 });
       }
     }
 
@@ -125,14 +125,14 @@ export async function POST(req: NextRequest) {
         currentState.variant,
       );
       if (!verification.isVerified) {
-        return NextResponse.json({ error: 'The claimed line cannot be verified' }, { status: 400 });
+        return NextResponse.json({ error: 'Die gemeldete Reihe kann nicht bestätigt werden' }, { status: 400 });
       }
     }
 
     const gameState = await requestGameState({ action, sessionId, roomName, variant, number, claimedNumbers });
     return NextResponse.json({ gameState });
   } catch {
-    return NextResponse.json({ error: 'Game service is unavailable' }, { status: 503 });
+    return NextResponse.json({ error: 'Der Spieldienst ist gerade nicht erreichbar' }, { status: 503 });
   }
 }
 
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
       const sessions = await requestSessions();
       return NextResponse.json({ sessions });
     } catch {
-      return NextResponse.json({ error: 'Game service is unavailable' }, { status: 503 });
+      return NextResponse.json({ error: 'Der Spieldienst ist gerade nicht erreichbar' }, { status: 503 });
     }
   }
 
@@ -152,6 +152,6 @@ export async function GET(req: NextRequest) {
     const gameState = await requestGameState({ action: 'ping', sessionId });
     return NextResponse.json({ gameState });
   } catch {
-    return NextResponse.json({ error: 'Game service is unavailable' }, { status: 503 });
+    return NextResponse.json({ error: 'Der Spieldienst ist gerade nicht erreichbar' }, { status: 503 });
   }
 }

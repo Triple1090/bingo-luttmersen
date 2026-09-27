@@ -12,11 +12,11 @@ export function Board({ maxNumber, drawnNumbers, verifiedBingo }: BoardProps) {
       : 'bingo-board--speedy';
 
   return (
-    <section className="bingo-board-section" aria-label="Called bingo numbers">
+    <section className="bingo-board-section" aria-label="Aufgerufene Bingo-Zahlen">
       {verifiedBingo && (
         <div className="bingo-announcement" role="alert">
           <strong>BINGO!</strong>
-          <span>Verified winning line: {verifiedBingo.join(', ')}</span>
+          <span>Bestätigte Gewinnreihe: {verifiedBingo.join(', ')}</span>
         </div>
       )}
       <div className={`bingo-board ${layoutClass}`}>

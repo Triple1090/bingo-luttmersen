@@ -7,11 +7,11 @@ export function DrawHistory({ drawnNumbers }: DrawHistoryProps) {
 
   return (
     <section className="draw-history" aria-labelledby="draw-history-title">
-      <h2 id="draw-history-title" className="draw-history-title">Called numbers</h2>
+      <h2 id="draw-history-title" className="draw-history-title">Aufgerufene Zahlen</h2>
       {calls.length === 0 ? (
-        <p className="draw-history-empty">No numbers have been called.</p>
+        <p className="draw-history-empty">Es wurden noch keine Zahlen aufgerufen.</p>
       ) : (
-        <ol className="draw-history-list" aria-label="Called numbers, newest first">
+        <ol className="draw-history-list" aria-label="Aufgerufene Zahlen, neueste zuerst">
           {calls.map((number, index) => (
             <li key={number} className="draw-history-item">
               <span className="draw-history-order">{drawnNumbers.length - index}</span>

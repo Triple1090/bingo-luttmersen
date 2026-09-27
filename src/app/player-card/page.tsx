@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Download, Printer, RefreshCw } from 'lucide-react';
 import type { GameVariant, RoomSummary } from '@/types/game';
 import { FREE_SPACE, generate75BallCard, generate90BallCard } from '@/lib/generateCard';
+import { getVariantLabel } from '@/lib/variants';
 
 const FREE_CELL = FREE_SPACE;
 type Card75 = number[][];
@@ -90,7 +91,7 @@ export default function PlayerCardPage() {
   useEffect(() => {
     setCards75(create75BallCards(cardCount));
     setCards90(create90BallCards(cardCount));
-    setPrintedDate(new Date().toLocaleDateString());
+    setPrintedDate(new Date().toLocaleDateString('de-DE'));
   }, []);
 
   const loadRooms = useCallback(async () => {
@@ -163,7 +164,7 @@ export default function PlayerCardPage() {
       setExportComplete(true);
     } catch (error) {
       console.error('Unable to export bingo cards as a PDF.', error);
-      setExportError('Unable to create the PDF. Please try again.');
+      setExportError('PDF konnte nicht erstellt werden. Bitte erneut versuchen.');
     } finally {
       setIsExporting(false);
     }
@@ -179,11 +180,11 @@ export default function PlayerCardPage() {
           className="rounded border border-bingo-muted bg-bingo-bg px-4 py-2 text-xl text-bingo-text"
         >
           {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-            <option key={n} value={n}>{n} card{n > 1 ? 's' : ''}</option>
+            <option key={n} value={n}>{n} Karte{n > 1 ? 'n' : ''}</option>
           ))}
         </select>
 
-        <label className="sr-only" htmlFor="card-set-room">Card set room</label>
+        <label className="sr-only" htmlFor="card-set-room">Raum für Kartensatz</label>
         <select
           id="card-set-room"
           value={selectedRoomId}
@@ -195,20 +196,20 @@ export default function PlayerCardPage() {
           onFocus={() => void loadRooms()}
           className="w-52 rounded border border-bingo-muted bg-bingo-bg px-4 py-2 text-xl text-bingo-text"
         >
-          <option value="">Select room</option>
+          <option value="">Raum auswählen</option>
           {supportedRooms.map((room) => (
-            <option key={room.sessionId} value={room.sessionId}>{room.roomName} - {room.variant}</option>
+            <option key={room.sessionId} value={room.sessionId}>{room.roomName} – {getVariantLabel(room.variant)}</option>
           ))}
         </select>
 
         <button
           type="button"
           onClick={handleNewCards}
-          title="Generate new cards"
+          title="Neue Karten erzeugen"
           className="flex h-11 w-11 items-center justify-center rounded border border-bingo-muted bg-bingo-bg text-bingo-text hover:bg-bingo-undrawn"
         >
           <RefreshCw className="h-5 w-5" />
-          <span className="sr-only">Generate new cards</span>
+          <span className="sr-only">Neue Karten erzeugen</span>
         </button>
 
         <button
@@ -217,7 +218,7 @@ export default function PlayerCardPage() {
           className="flex items-center gap-2 rounded-xl bg-bingo-accent px-6 py-2 text-lg font-bold text-bingo-bg hover:opacity-90"
         >
           <Printer className="h-5 w-5" />
-          Print
+          Drucken
         </button>
 
         <button
@@ -227,10 +228,10 @@ export default function PlayerCardPage() {
           className="flex items-center gap-2 rounded-xl border-2 border-bingo-accent px-6 py-2 text-lg font-bold text-bingo-accent hover:bg-bingo-accent hover:text-bingo-bg disabled:cursor-wait disabled:opacity-60"
         >
           <Download className="h-5 w-5" />
-          {isExporting ? 'Preparing PDF...' : 'Download PDF'}
+          {isExporting ? 'PDF wird erstellt …' : 'PDF herunterladen'}
         </button>
         {exportError && <p role="alert" className="text-sm text-red-300">{exportError}</p>}
-        {exportComplete && <p role="status" className="text-sm text-bingo-muted">PDF download started.</p>}
+        {exportComplete && <p role="status" className="text-sm text-bingo-muted">PDF-Download gestartet.</p>}
       </div>
 
       {/* Card display */}
@@ -244,7 +245,7 @@ export default function PlayerCardPage() {
 
       {/* Footer */}
       <p className="w-full bg-bingo-surface px-6 py-2 text-center text-sm text-bingo-muted">
-        {variant} Bingo{printedDate ? ` — Printed ${printedDate}` : ''}
+        Bingo {getVariantLabel(variant)}{printedDate ? ` – Gedruckt am ${printedDate}` : ''}
       </p>
     </div>
   );

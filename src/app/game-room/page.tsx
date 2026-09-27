@@ -59,7 +59,7 @@ function GameRoom() {
         roomId={roomId}
         rooms={availableRooms}
         onRoomChange={handleRoomChange}
-        variant={cfg.name}
+        variant={cfg.label}
         drawnCount={state?.drawnNumbers.length ?? 0}
         status={state?.status ?? 'waiting'}
       />
